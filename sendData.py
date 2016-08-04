@@ -2,7 +2,7 @@ import elasticsearch
 import time
 import logging
 
-es = elasticsearch.Elasticsearch([{'host': 'localhost', 'port': 9200}])
+es = elasticsearch.Elasticsearch([{'host': 'elasticsearch', 'port': 9200}])
 
 def sendToElastic(data, id, index='hosts', doc_type='sub'):
     for i in range(10):
