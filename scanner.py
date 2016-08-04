@@ -29,6 +29,7 @@ def launchScan(url_file):
         for index, url in enumerate(urls):
             scanUrl(url, index)
 
+
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
-    launchScan('domains')
+    logging.basicConfig(filename='/var/log/sec_header_scan.log',level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')
+    launchScan('/usr/share/all_domains')
