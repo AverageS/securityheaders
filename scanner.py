@@ -4,14 +4,12 @@ import time
 import logging
 
 
-def launchScan(url_file):
-    with open(url_file) as fp:
-        urls = [t.replace('\n', '') for t in fp.readlines()]
-    for index, url in enumerate(urls):
+def scanUrl(url, index):
+    try:
         headers = getHeaders(url)
         if headers is None:
             logging.error(' '.join([url, 'could not get']))
-            continue
+            return
         grade = checkHeaders(headers)
         data = {
             'host_url': url,
@@ -21,7 +19,15 @@ def launchScan(url_file):
         }
         logging.info(' '.join([url, 'sent to elastic']))
         sendToElastic(data, id=index)
+    except:
+        logging.error('Something went very wrong with url: ' + url)
 
+def launchScan(url_file):
+    while True:
+        with open(url_file) as fp:
+            urls = [t.replace('\n', '') for t in fp.readlines()]
+        for index, url in enumerate(urls):
+            scanUrl(url, index)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(levelname)s - %(message)s')

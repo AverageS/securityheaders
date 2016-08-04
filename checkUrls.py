@@ -63,6 +63,7 @@ def getHeaders(url):
                 headers_dict[header] = 'MISSING'
             else:
                 headers_dict[header] = data.getheader(header)
+        headers_dict['server'] = ''
         if 'server' in header_names:
             if data.getheader('Server') in SERVER_NAMES:
                 headers_dict['server'] = data.getheader('Server')
@@ -71,5 +72,5 @@ def getHeaders(url):
         return headers_dict
 
 if __name__ == '__main__':
-    t = getHeaders('gosuslugi.ru')
+    t = getHeaders('365.minsvyaz.ru')
     print(checkHeaders(t))
