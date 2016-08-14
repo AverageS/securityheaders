@@ -9,7 +9,12 @@ SERVER_NAMES = ['Microsoft-IIS', 'nginx', 'apache']
 
 X_XSS_REGEX = re.compile('^1;(\s?(mode=block)|(report=.*))$')
 
+X_FRAME_OPTIONS_REGEX = re.compile('^(DENY)|(SAMEORIGIN)|(ALLOW-FROM=.*)$')
+
+X_CONTENT_TYPE_REGEX = re.compile('^nosniff$')
+
 HTTP_REGEX = re.compile('^http(s)?://.*$')
+
 
 #TODO УЛучшить систему оценки, добавить Try\except
 def check_X_XSS_header(header_data):
@@ -18,17 +23,37 @@ def check_X_XSS_header(header_data):
         ans = 'X-XSS-Protection is properly configured'
     else:
         ans = 'X-XSS-Protection is misconfigured'
-        grade_diff -= 10
+        grade_diff -= 20
     return ans, grade_diff
 
 def checkServer(header_data):
     if header_data in SERVER_NAMES:
-        return 'Server is probably disclosing information about itself', -10
+        return 'Server is probably disclosing information about itself', -20
     return 'Server has probably changed its name', 0
+
+def check_x_frame(header_data):
+    grade_diff = 0
+    if X_FRAME_OPTIONS_REGEX.match(header_data):
+        ans = 'X-FRAME-OPTIONS are propely configured'
+    else:
+        ans = 'X-FRAME-OPTIONS are probably misconfigured'
+        grade_diff -= 15
+    return ans, grade_diff
+
+def check_x_content_type(header_data):
+    grade_diff = 0
+    if X_CONTENT_TYPE_REGEX.match(header_data):
+        ans = 'X_CONTENT TYPE OPTIONS are properly configured'
+    else:
+        ans = 'X_CONTENT TYPE OPTIONS are probably misconfigured'
+        grade_diff -= 15
+    return ans, grade_diff
 
 CHECKING_FUNCTIONS = {
     'x-xss-protection': check_X_XSS_header,
     'server': checkServer,
+    'x-frame-options': check_x_frame,
+    'x-content-type-options': check_x_content_type,
 }
 
 def checkHeaders(headers_dict):
@@ -72,5 +97,5 @@ def getHeaders(url):
         return headers_dict
 
 if __name__ == '__main__':
-    t = getHeaders('365.minsvyaz.ru')
+    t = getHeaders('http://eric.ish-lyon.cnrs.fr/')
     print(checkHeaders(t))
