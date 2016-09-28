@@ -1,6 +1,8 @@
-import urllib.request
+import requests # urllib.request
 import re
 import logging
+import time
+import random
 
 SECURITY_HEADER_NAMES = ['content-security-policy','strict-transport-security','public-key-pins','x-xss-protection',
                          'x-content-type-options','x-frame-options']
@@ -15,7 +17,7 @@ X_CONTENT_TYPE_REGEX = re.compile('^nosniff$')
 
 HTTP_REGEX = re.compile('^http(s)?://.*$')
 
-
+TIMEOUT = 2
 #TODO УЛучшить систему оценки, добавить Try\except
 def check_X_XSS_header(header_data):
     grade_diff = 0
@@ -56,6 +58,19 @@ CHECKING_FUNCTIONS = {
     'x-content-type-options': check_x_content_type,
 }
 
+def sleeping_decorator(f):
+    def wrapper(url):
+        for i in range(5):
+            try:
+                return f(url)
+            except requests.ConnectionError:
+                time.sleep(0.25)
+            except:
+                logging.error('Could not get answer from  ' + url)
+                return None
+        logging.error('Could not get answer from  ' + url)
+    return wrapper
+
 def checkHeaders(headers_dict):
     ans_dict = {}
     grade = 100
@@ -71,13 +86,16 @@ def checkHeaders(headers_dict):
     ans_dict['grade'] = grade
     return ans_dict
 
+@sleeping_decorator
 def getHeaders(url):
     if not HTTP_REGEX.match(url):
-        url = 'http://' + url
+        url = 'https://' + url.rstrip()
     try:
-        req =  urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        data = urllib.request.urlopen(req)
-    except:
+        data =  requests.get(url, verify=False, timeout=TIMEOUT, headers={'User-Agent': 'Mozilla/5.0'}, allow_redirects=True)
+    except requests.exceptions.ConnectionError as e:
+        raise requests.ConnectionError
+    except Exception as e:
+        logging.error('Could not get answer from  ' + url)
         return None
     else:
         header_names = [header.lower() for header in data.headers]
@@ -87,15 +105,15 @@ def getHeaders(url):
             if not header in header_names:
                 headers_dict[header] = 'MISSING'
             else:
-                headers_dict[header] = data.getheader(header)
+                headers_dict[header] = data.headers[header]
         headers_dict['server'] = ''
         if 'server' in header_names:
-            if data.getheader('Server') in SERVER_NAMES:
-                headers_dict['server'] = data.getheader('Server')
+            if data.headers['Server'] in SERVER_NAMES:
+                headers_dict['server'] = data.headers['Server']
                 grade -= 10
         logging.info(' '.join([url, 'headers collected']))
         return headers_dict
 
 if __name__ == '__main__':
-    t = getHeaders('http://eric.ish-lyon.cnrs.fr/')
+    t = getHeaders('esnsi.gosuslugi.ru')
     print(checkHeaders(t))
