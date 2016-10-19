@@ -1,25 +1,25 @@
 from checkUrls import getHeaders, checkHeaders
-#from sendData import sendToElastic
+from sendData import sendToElastic
 import time
-import multiprocessing.dummy as multiprocessing
-from contextlib import closing
+import multiprocessing as multiprocessing
 import logging
 
 
-def scanUrl(url):
+def scanUrl(tuple):
     try:
+        url,index = tuple
         headers = getHeaders(url)
         if headers is None:
             return url
         grade = checkHeaders(headers)
         data = {
             'host_url': url,
-            'raw_headers': headers,
-            'headers_grade': grade,
-            'latestRefresh': int(round(time.time() * 1000))
+           'raw_headers': headers,
+           'headers_grade': grade,
+           'latestRefresh': int(round(time.time() * 1000))
         }
-        #logging.info(' '.join([url, 'sent to elastic']))
-        #sendToElastic(data, id=index)
+        logging.info(' '.join([url, 'sent to elastic']))
+        sendToElastic(data, id=index)
         return ''
     except Exception as e:
         print('Something went very wrong with url: ' + url)
@@ -28,37 +28,17 @@ def scanUrl(url):
 def launchScan(url_file):
     while True:
         with open(url_file) as fp:
-            urls = [t.replace('\n', '') for t in fp.readlines()]
-        formatted_urls = ['https://' + url if "http" not in url else url for url in urls]
-        #urls = formatted_urls
-        i = 0
-        errors = []
-        simul_scans = 30
-
-        while i < len(urls):
-            with closing(multiprocessing.Pool(simul_scans)) as p:
-                errors.extend(list(p.map(scanUrl, urls[i:i + 15])))
-                i += simul_scans
-                print('yoba')
-
+            urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
+        p = multiprocessing.Pool(processes=15, maxtasksperchild=1)
+        errors = list(p.map(scanUrl, urls_index_tuple, 15))
         ans = [x for x in errors if x != '']
         print(ans)
-        print(len(ans))
-
-        '''
-        counter = 0
-        error_urls = []
-        for index, url in enumerate(urls):
-            try:
-                scanUrl(url)
-                counter += 1
-            except:
-                error_urls.append(url)
-        '''
-        #logging.info('ALL %d \nSUCCESFULL %d', index, counter)
-        #print(error_urls)
+        not_ans = [x[0] for x in urls_index_tuple if x[0] not in ans ]
+        for x in not_ans:
+            print(x + '\n')
+        return
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.ERROR,format='%(asctime)s - %(levelname)s - %(message)s')
-    launchScan('all_domains')
+    launchScan('/usr/share/all_domains')

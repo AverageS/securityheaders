@@ -2,7 +2,6 @@ import requests # urllib.request
 import re
 import logging
 import time
-import random
 
 SECURITY_HEADER_NAMES = ['content-security-policy','strict-transport-security','public-key-pins','x-xss-protection',
                          'x-content-type-options','x-frame-options']
@@ -17,7 +16,7 @@ X_CONTENT_TYPE_REGEX = re.compile('^nosniff$')
 
 HTTP_REGEX = re.compile('^http(s)?://.*$')
 
-TIMEOUT = 2
+TIMEOUT = 5
 #TODO УЛучшить систему оценки, добавить Try\except
 def check_X_XSS_header(header_data):
     grade_diff = 0
@@ -89,14 +88,13 @@ def checkHeaders(headers_dict):
 @sleeping_decorator
 def getHeaders(url):
     if not HTTP_REGEX.match(url):
-        url = 'https://' + url.rstrip()
+        url = 'http://' + url.rstrip().rstrip('.')
     try:
-        data =  requests.get(url, verify=False, timeout=TIMEOUT, headers={'User-Agent': 'Mozilla/5.0'}, allow_redirects=True)
-    except requests.exceptions.ConnectionError as e:
-        raise requests.ConnectionError
+        data =  requests.get(url, verify=False, timeout=TIMEOUT,
+                             headers={'User-Agent': 'Mozilla/5.0'},
+                             allow_redirects=True)
     except Exception as e:
-        logging.error('Could not get answer from  ' + url)
-        return None
+        raise e
     else:
         header_names = [header.lower() for header in data.headers]
         headers_dict = {}
@@ -115,5 +113,6 @@ def getHeaders(url):
         return headers_dict
 
 if __name__ == '__main__':
-    t = getHeaders('esnsi.gosuslugi.ru')
+    'asdg. '.strip().strip('.')
+    t = getHeaders('esnsi.gosuslugi.ru ')
     print(checkHeaders(t))
