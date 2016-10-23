@@ -58,7 +58,7 @@ def sendToElastic(data, id, index='hosts', doc_type='sub'):
             break
         except:
             pass
-        es.indices.create(index='hosts', ignore=400, body=mapping)
+        es.indices.create(index='headers', ignore=400, body=mapping)
     for i in range(10):
         try:
             es.index(index=index, doc_type=doc_type,id=id,body=data)
