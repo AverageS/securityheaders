@@ -51,14 +51,14 @@ mapping = {
 
 while True:
     try:
-        es = elasticsearch.Elasticsearch([{'host': 'elasticsearch', 'port': 9200}])
+        es = elasticsearch.Elasticsearch([{'host': 'localhost', 'port': 9200}])
         es.indices.create(index='headers', ignore=400, body=mapping)
         break
     except:
         pass
 
 
-def sendToElastic(data, id, index='hosts', doc_type='sub'):
+def sendToElastic(data, id, index='headers', doc_type='sub'):
     for i in range(10):
         try:
             es.index(index=index, doc_type=doc_type,id=id,body=data)
