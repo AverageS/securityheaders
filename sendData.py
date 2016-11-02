@@ -52,6 +52,7 @@ mapping = {
 while True:
     try:
         es = elasticsearch.Elasticsearch([{'host': 'elasticsearch', 'port': 9200}])
+        es.indices.delete(index='headers')
         es.indices.create(index='headers', ignore=400, body=mapping)
         break
     except:
