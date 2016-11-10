@@ -33,6 +33,7 @@ def launchScan(url_file):
             urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
         p = multiprocessing.Pool(processes=4, maxtasksperchild=1)
         errors = list(p.map(scanUrl, urls_index_tuple, 15))
+        p.close()
         time.sleep(600)
 
 if __name__ == '__main__':
