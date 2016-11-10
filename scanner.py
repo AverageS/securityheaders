@@ -33,8 +33,7 @@ def launchScan(url_file):
             urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
         p = multiprocessing.Pool(processes=4, maxtasksperchild=1)
         errors = list(p.map(scanUrl, urls_index_tuple, 15))
-        ans = [x for x in errors if x != '']
-        logging.error(ans)
+        time.sleep(600)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.ERROR,format='%(asctime)s - %(levelname)s - %(message)s')
