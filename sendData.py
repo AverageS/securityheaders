@@ -58,14 +58,18 @@ while True:
     except:
         pass
 
+def trying_decorator(func):
+    def wrapper(data, id, index='headers', doc_type='sub'):
+        while True:
+            try:
+                func(data, id, index, doc_type)
+                return
+            except:
+                pass
+    return wrapper
 
+@trying_decorator
 def sendToElastic(data, id, index='headers', doc_type='sub'):
-    for i in range(10):
-        try:
-            es.index(index=index, doc_type=doc_type,id=id,body=data)
-        except:
-            time.sleep(10)
-        else:
-            return
-    logging.error('Could not send data to elastic')
+    es.index(index=index, doc_type=doc_type,id=id,body=data)
+    logging.info('data sent')
 
