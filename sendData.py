@@ -56,6 +56,7 @@ while True:
         es.indices.create(index='headers', ignore=400, body=mapping)
         break
     except:
+        time.sleep(10)
         pass
 
 def trying_decorator(func):
@@ -65,6 +66,7 @@ def trying_decorator(func):
                 func(data, id, index, doc_type)
                 return
             except:
+                time.sleep(10)
                 pass
     return wrapper
 
