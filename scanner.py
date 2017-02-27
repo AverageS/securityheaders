@@ -30,16 +30,17 @@ def scanUrl(tuple):
 
 
 def launchScan(url_file):
-    while True:
-        with open(url_file) as fp:
-            urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
-        p = multiprocessing.Pool(processes=4, maxtasksperchild=1)
-        errors = list(p.map(scanUrl, urls_index_tuple, 15))
-        with open('corrupted_urls', 'w') as fp:
-            [fp.writelines(x + '\n') for x in errors]
-        p.close()
+    with open(url_file) as fp:
+        urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
+    p = multiprocessing.Pool(processes=4, maxtasksperchild=1)
+    errors = list(p.map(scanUrl, urls_index_tuple, 15))
+    with open('corrupted_urls', 'w') as fp:
+        [fp.writelines(x + '\n') for x in errors]
+    p.close()
 
 if __name__ == '__main__':
     logging.getLogger('requests').setLevel(logging.ERROR)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    launchScan('/usr/share/all_domains')
+    while True:
+        launchScan('/usr/share/all_domains')
+        time.sleep(86400)
