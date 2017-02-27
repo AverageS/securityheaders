@@ -20,7 +20,7 @@ def scanUrl(tuple):
            'missing_headers': ' '.join([key.replace('-', 'I') for key, value in headers.items() if 'MISSING' in value ]),
            'latestRefresh': int(round(time.time() * 1000))
         }
-        logging.info(': '.join([url, str(grade['grade'])]))
+        logging.info(str(data))
 
         #sendToElastic(data, id=index)
         return ''
