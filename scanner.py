@@ -1,5 +1,5 @@
 from checkUrls import getHeaders, checkHeaders
-#from sendData import sendToElastic
+from sendData import sendToElastic
 import time
 import multiprocessing as multiprocessing
 import logging
@@ -22,7 +22,7 @@ def scanUrl(tuple):
         }
         logging.info(str(data))
 
-        #sendToElastic(data, id=index)
+        sendToElastic(data, id=index)
         return ''
     except Exception as e:
         logging.error('Something went very wrong with url: ' + url)
