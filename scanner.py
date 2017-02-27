@@ -1,5 +1,5 @@
 from checkUrls import getHeaders, checkHeaders
-#from sendData import sendToElastic
+from sendData import sendToElastic
 import time
 import multiprocessing as multiprocessing
 import logging
@@ -22,24 +22,24 @@ def scanUrl(tuple):
         }
         logging.info(': '.join([url, str(grade['grade'])]))
 
-        #sendToElastic(data, id=index)
+        sendToElastic(data, id=index)
         return ''
     except Exception as e:
         logging.error('Something went very wrong with url: ' + url)
         return url
 
-
 def launchScan(url_file):
-    while True:
-        with open(url_file) as fp:
-            urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
-        p = multiprocessing.Pool(processes=4, maxtasksperchild=1)
-        errors = list(p.map(scanUrl, urls_index_tuple, 15))
-        with open('corrupted_urls', 'w') as fp:
-            [fp.writelines(x + '\n') for x in errors]
-        p.close()
+    with open(url_file) as fp:
+        urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
+    p = multiprocessing.Pool(processes=4, maxtasksperchild=1)
+    errors = list(p.map(scanUrl, urls_index_tuple, 15))
+    with open('corrupted_urls', 'w') as fp:
+        [fp.writelines(x + '\n') for x in errors]
+    p.close()
 
 if __name__ == '__main__':
     logging.getLogger('requests').setLevel(logging.ERROR)
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    launchScan('all_domains')
+    logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+    while True:
+        launchScan('all_domains')
+        time.sleep(86400)
