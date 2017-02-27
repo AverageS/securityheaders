@@ -112,7 +112,3 @@ def getHeaders(url):
         logging.debug(' '.join([url, 'headers collected']))
         return headers_dict
 
-if __name__ == '__main__':
-    'asdg. '.strip().strip('.')
-    t = getHeaders('esnsi.gosuslugi.ru ')
-    print(checkHeaders(t))
