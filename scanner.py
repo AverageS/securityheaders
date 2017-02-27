@@ -1,5 +1,5 @@
 from checkUrls import getHeaders, checkHeaders
-from sendData import sendToElastic
+#from sendData import sendToElastic
 import time
 import multiprocessing as multiprocessing
 import logging
@@ -7,7 +7,7 @@ import logging
 
 def scanUrl(tuple):
     try:
-        url,index = tuple
+        url, index = tuple
         headers = getHeaders(url)
         if headers is None:
             return url
@@ -16,16 +16,18 @@ def scanUrl(tuple):
            'host_url': url,
            'raw_headers': headers,
            'headers_grade': grade,
-            'presented_headers': ' '.join([key.replace('-', 'I') for key, value in headers.items() if 'MISSING' not in value ]),
-            'missing_headers': ' '.join([key.replace('-', 'I') for key, value in headers.items() if 'MISSING' in value ]),
+           'presented_headers': ' '.join([key.replace('-', 'I') for key, value in headers.items() if 'MISSING' not in value ]),
+           'missing_headers': ' '.join([key.replace('-', 'I') for key, value in headers.items() if 'MISSING' in value ]),
            'latestRefresh': int(round(time.time() * 1000))
         }
-        logging.info(' '.join([url, 'sent to elastic']))
-        sendToElastic(data, id=index)
+        logging.info(': '.join([url, str(grade['grade'])]))
+
+        #sendToElastic(data, id=index)
         return ''
     except Exception as e:
-        print('Something went very wrong with url: ' + url)
+        logging.error('Something went very wrong with url: ' + url)
         return url
+
 
 def launchScan(url_file):
     while True:
@@ -33,9 +35,11 @@ def launchScan(url_file):
             urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
         p = multiprocessing.Pool(processes=4, maxtasksperchild=1)
         errors = list(p.map(scanUrl, urls_index_tuple, 15))
+        with open('corrupted_urls', 'w') as fp:
+            [fp.writelines(x + '\n') for x in errors]
         p.close()
-        time.sleep(600)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.ERROR,format='%(asctime)s - %(levelname)s - %(message)s')
-    launchScan('/usr/share/all_domains')
+    logging.getLogger('requests').setLevel(logging.ERROR)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    launchScan('all_domains')

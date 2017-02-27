@@ -109,7 +109,7 @@ def getHeaders(url):
             if data.headers['Server'] in SERVER_NAMES:
                 headers_dict['server'] = data.headers['Server']
                 grade -= 10
-        logging.info(' '.join([url, 'headers collected']))
+        logging.debug(' '.join([url, 'headers collected']))
         return headers_dict
 
 if __name__ == '__main__':
