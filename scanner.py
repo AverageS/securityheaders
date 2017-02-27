@@ -1,5 +1,5 @@
 from checkUrls import getHeaders, checkHeaders
-from sendData import sendToElastic
+#from sendData import sendToElastic
 import time
 import multiprocessing as multiprocessing
 import logging
@@ -20,26 +20,26 @@ def scanUrl(tuple):
            'missing_headers': ' '.join([key.replace('-', 'I') for key, value in headers.items() if 'MISSING' in value ]),
            'latestRefresh': int(round(time.time() * 1000))
         }
-        logging.info(': '.join([url, str(grade['grade'])]))
+        logging.info(str(data))
 
-        sendToElastic(data, id=index)
+        #sendToElastic(data, id=index)
         return ''
     except Exception as e:
         logging.error('Something went very wrong with url: ' + url)
         return url
 
+
 def launchScan(url_file):
-    with open(url_file) as fp:
-        urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
-    p = multiprocessing.Pool(processes=4, maxtasksperchild=1)
-    errors = list(p.map(scanUrl, urls_index_tuple, 15))
-    with open('corrupted_urls', 'w') as fp:
-        [fp.writelines(x + '\n') for x in errors]
-    p.close()
+    while True:
+        with open(url_file) as fp:
+            urls_index_tuple = [(t.replace('\n', ''), index) for index, t in enumerate(fp.readlines())]
+        p = multiprocessing.Pool(processes=4, maxtasksperchild=1)
+        errors = list(p.map(scanUrl, urls_index_tuple, 15))
+        with open('corrupted_urls', 'w') as fp:
+            [fp.writelines(x + '\n') for x in errors]
+        p.close()
 
 if __name__ == '__main__':
     logging.getLogger('requests').setLevel(logging.ERROR)
-    logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
-    while True:
-        launchScan('all_domains')
-        time.sleep(86400)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    launchScan('/usr/share/all_domains')
