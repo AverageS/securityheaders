@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import elasticsearch
 import time
 import logging

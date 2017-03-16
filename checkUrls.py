@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests # urllib.request
 import re
 import logging
