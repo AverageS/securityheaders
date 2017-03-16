@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from checkUrls import getHeaders, checkHeaders
 from sendData import sendToElastic
 import time
