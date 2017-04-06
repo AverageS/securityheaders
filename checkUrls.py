@@ -6,7 +6,7 @@ import logging
 import time
 
 SECURITY_HEADER_NAMES = ['content-security-policy','strict-transport-security','public-key-pins','x-xss-protection',
-                         'x-content-type-options','x-frame-options']
+                         'x-content-type-options','x-frame-options', 'server']
 
 SERVER_NAMES = ['Microsoft-IIS', 'nginx', 'apache']
 
@@ -92,7 +92,7 @@ def getHeaders(url):
     if not HTTP_REGEX.match(url):
         url = 'http://' + url.rstrip().rstrip('.')
     try:
-        data =  requests.get(url, verify=False, timeout=TIMEOUT,
+        data = requests.get(url, verify=False, timeout=TIMEOUT,
                              headers={'User-Agent': 'Mozilla/5.0'},
                              allow_redirects=True)
     except Exception as e:
