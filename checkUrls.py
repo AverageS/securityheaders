@@ -6,7 +6,7 @@ import logging
 import time
 
 SECURITY_HEADER_NAMES = ['content-security-policy','strict-transport-security','public-key-pins','x-xss-protection',
-                         'x-content-type-options','x-frame-options', 'server']
+                         'x-content-type-options','x-frame-options', 'server', 'X-Powered-By']
 
 SERVER_NAMES = ['Microsoft-IIS', 'nginx', 'apache']
 
@@ -102,7 +102,7 @@ def getHeaders(url):
         headers_dict = {}
         grade = 100
         for header in SECURITY_HEADER_NAMES:
-            if not header in header_names:
+            if header not in header_names:
                 headers_dict[header] = 'MISSING'
             else:
                 headers_dict[header] = data.headers[header]
