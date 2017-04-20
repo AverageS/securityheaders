@@ -108,11 +108,6 @@ def getHeaders(url):
                 headers_dict[header] = 'MISSING'
             else:
                 headers_dict[header] = data.headers[header]
-        headers_dict['server'] = ''
-        if 'server' in header_names:
-            if data.headers['Server'] in SERVER_NAMES:
-                headers_dict['server'] = data.headers['Server']
-                grade -= 10
         logging.debug(' '.join([url, 'headers collected']))
         return headers_dict
 
