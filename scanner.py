@@ -41,7 +41,7 @@ def launchScan(url_file):
 
 if __name__ == '__main__':
     logging.getLogger('requests').setLevel(logging.ERROR)
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
     while True:
-        launchScan('/usr/share/all_domains')
+        launchScan('all_domains')
         time.sleep(86400)

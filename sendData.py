@@ -51,15 +51,13 @@ mapping = {
     }
 }
 
-while True:
-    try:
-        es = elasticsearch.Elasticsearch([{'host': 'elasticsearch', 'port': 9200}])
-        es.indices.delete(index='headers')
-        es.indices.create(index='headers', ignore=400, body=mapping)
-    except:
-        time.sleep(10)
-        pass
-    break
+try:
+    es = elasticsearch.Elasticsearch([{'host': 'localhost', 'port': 9200}])
+    es.indices.delete(index='headers')
+    es.indices.create(index='headers', ignore=400, body=mapping)
+except:
+    es.indices.create(index='headers', ignore=400, body=mapping)
+
 
 def trying_decorator(func):
     def wrapper(data, id, index='headers', doc_type='sub'):
