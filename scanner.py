@@ -43,5 +43,5 @@ if __name__ == '__main__':
     logging.getLogger('requests').setLevel(logging.ERROR)
     logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
     while True:
-        launchScan('all_domains')
+        launchScan('/usr/share/all_domains')
         time.sleep(86400)
